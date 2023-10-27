@@ -1,10 +1,21 @@
 const User = require("./models/user");
 const Game = require("./models/game");
 const cron = require("node-cron");
+const readline = require("readline");
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
 
 const mongoose = require("mongoose");
 
-mongoose.connect("mongodb+srv://admin:admin@cluster0.h4dzasn.mongodb.net/");
+let mongodbURI = "";
+
+rl.question("Enter Mongodb URI ", (input) => {
+    mongodbURI = input;
+    rl.close();
+});
 
 const randomGameSelector = (games) => {
     const num = Math.floor(Math.random() * games.length);
@@ -22,6 +33,8 @@ const randomGameSelector = (games) => {
 };
 
 const checkWinners = async () => {
+    await mongoose.connect(mongodbURI);
+
     const winners = [];
 
     const date = new Date();
@@ -80,4 +93,6 @@ const checkWinners = async () => {
     mongoose.connection.close();
 };
 
-cron.schedule("0 13 * * 0", checkWinners);
+rl.on("close", () => {
+    cron.schedule("0 13 * * 0", checkWinners);
+});
