@@ -79,7 +79,7 @@ const checkWinners = async () => {
             });
         }
     }
-    mongoose.connection.close();
+    await mongoose.connection.close();
 };
 
 cron.schedule("0 13 * * 0", checkWinners);
